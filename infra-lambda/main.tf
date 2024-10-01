@@ -4,12 +4,12 @@ terraform {
     aws = { source = "hashicorp/aws", version = "5.17.0" }
   }
 
-  # caso deseje salvar o estado do terraform em um bucket S3
-  # backend "s3" {
-  #   bucket = "lambda-api-terraform-state-bucket-005"
-  #   key    = "estado/terraform.tfstate"
-  #   region = "us-east-1"
-  # }
+  # Necessário salvar o estado do terraform em um bucket S3
+  backend "s3" {
+    bucket = "lambda-api-terraform-state-bucket-005"
+    key    = "estado/terraform.tfstate"
+    region = "us-east-1"
+  }
 }
 
 provider "aws" {

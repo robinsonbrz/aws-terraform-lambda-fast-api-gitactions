@@ -11,6 +11,9 @@ app = FastAPI()
 def index():
     return "Hello, from FastAPI-Lambda-AWS-Terraform"
 
+@app.get("/second")
+def index():
+    return "Second Hello, from FastAPI-Lambda-AWS-Terraform"
 
 handler = Mangum(app, lifespan="off")
 
