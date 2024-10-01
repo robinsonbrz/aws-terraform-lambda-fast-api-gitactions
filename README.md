@@ -1,5 +1,12 @@
 # Projeto Lambda Python Fast Api, Terraform e CI / CD
 
+
+```
+git@github.com:robinsonbrz/aws-terraform-lambda-fast-api-gitactions.git
+
+cd aws-terraform-lambda-fast-api-gitactions
+```
+
 ```
 python -m venv .venv
 
@@ -15,6 +22,8 @@ python src/app.py
 ```
 
 ```
+cd infra-lambda
+
 terraform init
 
 terraform fmt
