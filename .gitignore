@@ -5,6 +5,7 @@ env/
 # Infrastructure
 .terraform/
 .terraform.lock.hcl
+terraform.tfstate
 
 # Development API
 __pycache__/

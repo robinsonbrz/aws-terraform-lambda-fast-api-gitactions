@@ -14,6 +14,18 @@ pip freeze
 python src/app.py
 ```
 
+```
+terraform init
+
+terraform fmt
+
+terraform apply
+
+# --auto-approve  não pede confirmação "yes"
+# terraform apply --auto-approve  
+```
+
+
 
 
 
