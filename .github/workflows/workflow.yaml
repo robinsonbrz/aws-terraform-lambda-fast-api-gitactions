@@ -44,7 +44,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: main
-          path: ./infra-lambda/
+          path: ./
 
       - name: Terraform Init
         env:
