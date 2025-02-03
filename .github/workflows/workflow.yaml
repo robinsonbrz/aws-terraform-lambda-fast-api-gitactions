@@ -5,8 +5,8 @@ on:
     branches: [ "main" ]
   pull_request:
 
-# permissions:
-#   contents: read
+permissions:
+  contents: read
 
 jobs:
   terraform:
@@ -18,43 +18,54 @@ jobs:
       run:
         shell: bash
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install Terraform
-      run: |
-        cd ~
-        sudo apt update
-        sudo apt install -y unzip wget
-        sudo wget https://releases.hashicorp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip
-        sudo unzip terraform_1.0.8_linux_amd64.zip
-        sudo chmod +x terraform
-        terraform --version
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y unzip wget
 
-    - name: Checkout Respository
-      uses: actions/checkout@v2
-      with:
-        ref: main
-        path: ./repository-files/
+      - name: Install Terraform
+        run: |
+          cd ~
+          sudo apt update
+          sudo apt install -y unzip wget
+          sudo wget https://releases.hashicorp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip
+          sudo unzip terraform_1.0.8_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          sudo chmod +x /usr/local/bin/terraform
 
-    - name: Terraform Init
-      env:
-        AWS_ACCESS_KEY_ID:     "${{ secrets.AWS_ACCESS_KEY_ID }}"
-        AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" 
-        #AWS_SESSION_TOKEN:     "${{ secrets.AWS_SESSION_TOKEN }}"
-      run:  cd ./repository-files/ && ls -la && ~/terraform init
+      - name: Check Terraform version
+        run: |
+          terraform --version
 
-    - name: Terraform Plan
-      env:
-        AWS_ACCESS_KEY_ID:     "${{ secrets.AWS_ACCESS_KEY_ID }}"
-        AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" 
-        #AWS_SESSION_TOKEN:     "${{ secrets.AWS_SESSION_TOKEN }}"
-      run:  cd  ./repository-files/ && ~/terraform plan 
+      - name: Checkout Respository
+        uses: actions/checkout@v2
+        with:
+          ref: main
+          path: ./repository-files/
 
-    - name: Wait Before Apply
-      run:  sleep  "${{ github.event.inputs.wait-time }}" || sleep "2m"
+      - name: Terraform Init
+        env:
+          AWS_ACCESS_KEY_ID:     "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" 
+          #AWS_SESSION_TOKEN:     "${{ secrets.AWS_SESSION_TOKEN }}"
+        run:  cd ./repository-files/ && ls -la && ~/terraform init
 
-    - name: Terraform Apply
-      env:
-        AWS_ACCESS_KEY_ID:     "${{ secrets.AWS_ACCESS_KEY_ID }}"
-        AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" 
-        #AWS_SESSION_TOKEN:     "${{ secrets.AWS_SESSION_TOKEN }}"
-      run:  cd ./repository-files/ && ~/terraform apply -auto-approve
+      - name: Terraform Plan
+        env:
+          AWS_ACCESS_KEY_ID:     "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" 
+          #AWS_SESSION_TOKEN:     "${{ secrets.AWS_SESSION_TOKEN }}"
+        run:  cd  ./repository-files/ && ~/terraform plan 
+
+      - name: Wait Before Apply
+        run:  sleep  "${{ github.event.inputs.wait-time }}" || sleep "2m"
+
+      - name: Terraform Apply
+        env:
+          AWS_ACCESS_KEY_ID:     "${{ secrets.AWS_ACCESS_KEY_ID }}"
+          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" 
+          #AWS_SESSION_TOKEN:     "${{ secrets.AWS_SESSION_TOKEN }}"
+        run:  cd ./repository-files/ && ~/terraform apply -auto-approve
