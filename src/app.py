@@ -1,8 +1,8 @@
 import os
+
 import uvicorn
 from fastapi import FastAPI
 from mangum import Mangum
-
 
 app = FastAPI()
 
@@ -11,9 +11,11 @@ app = FastAPI()
 def index():
     return "Hello, from FastAPI-Lambda-AWS-Terraform"
 
+
 @app.get("/second")
-def index():
+def index_second():
     return "Second Hello, from FastAPI-Lambda-AWS-Terraform"
+
 
 handler = Mangum(app, lifespan="off")
 
