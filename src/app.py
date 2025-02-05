@@ -9,7 +9,7 @@ app = FastAPI()
 
 @app.get("/")
 def index():
-    return "Hello, from FastAPI-Lambda-AWS-Terraform"
+    return "Hello, from FastAPI-Lambda-AWS-Terraform - Robinson"
 
 
 @app.get("/second")

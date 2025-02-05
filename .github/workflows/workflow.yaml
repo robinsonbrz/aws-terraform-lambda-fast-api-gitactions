@@ -14,6 +14,7 @@ jobs:
     defaults:
       run:
         shell: bash
+        working-directory: ./infra-lambda
 
     steps:
     - name: Checkout
@@ -30,17 +31,13 @@ jobs:
         aws-region:  ${{ vars.AWS_REGION }}
 
     - name: Terraform Init
-      working-directory: ./infra-lambda
       run: terraform init
 
     - name: Terraform Format
-      working-directory: ./infra-lambda
       run: terraform fmt -check
 
     - name: Terraform Plan
-      working-directory: ./infra-lambda
       run: terraform plan
 
     - name: Terraform Apply
-      working-directory: ./infra-lambda
       run: terraform apply -auto-approve
