@@ -1,15 +1,12 @@
-name: CI/CD
+name: CI Lambda
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-
-permissions:
-  contents: read
 
 jobs:
-  terraform:
+  terraform-apply:
+
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: production
@@ -17,62 +14,29 @@ jobs:
     defaults:
       run:
         shell: bash
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y unzip wget
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
 
-      - name: Install Terraform
-        run: |
-          cd ~
-          sudo apt update
-          sudo apt install -y unzip wget
-          sudo wget https://releases.hashicorp.com/terraform/1.10.5/terraform_1.10.5_linux_amd64.zip
-          sudo unzip terraform_1.10.5_linux_amd64.zip
-          sudo mv terraform /usr/local/bin/
-          sudo chmod +x /usr/local/bin/terraform
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region:  ${{ vars.AWS_REGION }}
 
-      - name: Check Terraform version
-        run: |
-          terraform --version
+    - name: Terraform Init
+      run: terraform init
 
-      - name: Checkout Respository
-        uses: actions/checkout@v2
-        with:
-          ref: main
-          path: ./
+    - name: Terraform Format
+      run: terraform fmt -check
 
-      - name: Terraform Init
-        env:
-          AWS_ACCESS_KEY_ID:     "${{ secrets.AWS_ACCESS_KEY_ID }}"
-          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" 
-          #AWS_SESSION_TOKEN:     "${{ secrets.AWS_SESSION_TOKEN }}"
-        run: |
-          echo "pwd" 
-          pwd
-          cd ./infra-lambda/
-          echo "pwd"
-          pwd
-          ls -la
-          ls -la && terraform init
+    - name: Terraform Plan
+      run: terraform plan
 
-      - name: Terraform Plan
-        env:
-          AWS_ACCESS_KEY_ID:     "${{ secrets.AWS_ACCESS_KEY_ID }}"
-          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" 
-          #AWS_SESSION_TOKEN:     "${{ secrets.AWS_SESSION_TOKEN }}"
-        run:  cd ./infra-lambda/ && terraform plan 
-
-      - name: Wait Before Apply
-        run:  sleep  "${{ github.event.inputs.wait-time }}" || sleep "2m"
-
-      - name: Terraform Apply
-        env:
-          AWS_ACCESS_KEY_ID:     "${{ secrets.AWS_ACCESS_KEY_ID }}"
-          AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}" 
-          #AWS_SESSION_TOKEN:     "${{ secrets.AWS_SESSION_TOKEN }}"
-        run:  cd ./infra-lambda/ && terraform apply -auto-approve
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
