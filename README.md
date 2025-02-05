@@ -2,124 +2,79 @@
 
 
 
+### Para utilizar o Terraform nessa configuração crie um bucket S3 com o nome: *lambda-api-terraform-state-001* antes de executar ```terraform init```
 
+Ou com o aws cli
+```bash
+aws s3 mb s3://lambda-api-terraform-state-001 
+```
 
+Clonar o repositório
 
 ```
-git@github.com:robinsonbrz/aws-terraform-lambda-fast-api-gitactions.git
+git clone git@github.com:robinsonbrz/aws-terraform-lambda-fast-api-gitactions.git
 
 cd aws-terraform-lambda-fast-api-gitactions
 ```
 
-```
-python -m venv .venv
 
-source .venv/bin/activate
+### Você pode configurar secrets e vars no GitHub Actions do repositório:
 
-python -m pip install --upgrade pip
+- Configurar Secrets (AWS_ACCESS_KEY_ID e AWS_SECRET_ACCESS_KEY)
 
-pip install -r src/requirements.txt
+Secrets são usadas para armazenar credenciais de forma segura.
 
-pip freeze
+Passos:
 
-python src/app.py
-```
+    Vá até o seu repositório no GitHub.
 
-Executando o projeto localmente
+        Clique em Settings (Configurações).
 
-```
-uvicorn src.app:app --reload --host 0.0.0.0 --port 8000 --log-level debug
-```
+            No menu esquerdo, role para baixo até Secrets and variables > Actions.
 
+Clique na aba Secrets.
 
-___
-- Executa todos os linters e flake8.
-```bash
-make lint
-```
-___
-- Executa apenas um teste de coverage e pytest.
-```bash
-make test
-```
-___
-- Pre commit. Executa os linters e executa um teste de coverage e pytest.
-```bash
-make pre
-```
+    Clique em New repository secret e adicione:
+
+        Nome: AWS_ACCESS_KEY_ID
+
+            Valor: Sua chave de acesso da AWS
+
+                Salve
+
+    Repita o processo para AWS_SECRET_ACCESS_KEY.
 
 
-flake8: Flake8 é uma ferramenta de linting de código para Python. Ele analisa seu código em busca de erros potenciais, inconsistências estilísticas (que o Black pode não detectar) e violações de práticas recomendadas comuns (com base no PEP 8
+Configurar Variáveis (AWS_REGION)
 
+Variáveis (vars) são usadas para armazenar valores não sensíveis.
 
-```
-flake8 ./src:
-```
+Passos:
 
-black: Black é um formatador de código muito popular e opinativo para Python.
+No mesmo menu Settings > Secrets and variables > Actions, 
 
-```
-black ./src
-```
+    vá para a aba Variables.
 
+        Clique em New repository variable.
 
+    Adicione:
 
-isort: isort é uma ferramenta que classifica automaticamente suas importações Python em ordem alfabética
+        Nome: AWS_REGION
 
-```
-isort ./src:
-```
+            Valor: A região da AWS (exemplo: us-east-1)
 
+                Salve
 
+Com isso todo push na branch "main" fará o disparo da pipe Git Actions
 
+Verifique o log na aba Actions do GitHub
 
-
-Executando testes
-
-
-Testes com cobertura
-```
-pytest --cov ./src -v 
-```
-
-Exportando testes para o formato html
-```
-python -m pytest --cov-report html --cov ./src
-```
+E no steps "Terraform Apply" encontre a url da api como no exemplo abaixo haverá uma nova url
 
 ```
-pytest --cov ./src -v && python -m pytest --cov-report html --cov ./src
+Apply complete! Resources: 0 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+api_url = "https://fx6aarhaxyniegmieue2n7eazy0qpame.lambda-url.us-east-1.on.aws/"
 ```
-
-
-Criando um bucket pelo AWS Cli para armazenar o estado do terraform
-
-```
-aws s3api create-bucket \     
-  --bucket nome-unico-lambda \
-  --region us-east-1
-
-```
-
-No arquivo main.tf substituir o nome do bucket pelo nome-unico-lambda, utilizado anteriormente
-
-
-```
-cd infra-lambda
-
-terraform init
-
-terraform fmt
-
-terraform apply
-
-# --auto-approve  não pede confirmação "yes"
-# terraform apply --auto-approve  
-```
-
-
-
-
-
-
-# aws-terraform-lambda-fast-api-gitactions

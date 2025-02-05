@@ -6,7 +6,7 @@ terraform {
 
   # Necessário salvar o estado do terraform em um bucket S3
   backend "s3" {
-    bucket = "lambda-api-terraform-state-bucket-006"
+    bucket = "lambda-api-terraform-state-001"
     key    = "estado/terraform.tfstate"
     region = "us-east-1"
   }
