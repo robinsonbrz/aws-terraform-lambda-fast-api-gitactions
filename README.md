@@ -1,13 +1,23 @@
 # Projeto Lambda Python Fast Api, Terraform e CI / CD
 
 
-
-### Para utilizar o Terraform nessa configuração crie um bucket S3 com o nome: *lambda-api-terraform-state-001* antes de executar ```terraform init```
+### Para utilizar o Terraform nessa configuração crie um bucket S3 com o nome: *nome-unico-aws-s3* antes de executar ```terraform init```
 
 Ou com o aws cli
+
 ```bash
-aws s3 mb s3://lambda-api-terraform-state-001 
+aws s3 mb s3://nome-unico-aws-s3  --region us-east-1
 ```
+Coloque o mesmo nome de bucket no arquivo infra-lambda/main.tf na chave bucket:
+
+```
+  backend "s3" {
+    bucket = "nome-unico-aws-s3"
+    key    = "estado/terraform.tfstate"
+    region = "us-east-1"
+  }
+```
+
 
 Clonar o repositório
 
