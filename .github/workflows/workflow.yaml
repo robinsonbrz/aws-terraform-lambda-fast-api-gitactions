@@ -42,4 +42,5 @@ jobs:
       run: terraform plan
 
     - name: Terraform Apply
+      working-directory: ./infra-lambda
       run: terraform apply -auto-approve
